@@ -1,7 +1,9 @@
 const express = require('express');
-const app = express();
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 require('./config/config');
+
+const app = express();
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -9,43 +11,14 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.get('/user', function(req, res) {
-    res.json('getUser');
-});
+app.use(require('./routes/user'));
 
-app.post('/user', function(req, res) {
+mongoose.connect(process.env.urlDB, { useNewUrlParser: true, useCreateIndex: true }, (err, res) => {
 
-    let body = req.body;
+    if (err) throw err
 
-    if (body.name === undefined) {
+    console.log('Data Base ONLINE');
 
-        res.status(400).json({
-            ok: false,
-            message: 'Name its necessary'
-        });
-
-    } else {
-
-        res.json({
-            person: body
-        });
-
-    }
-
-});
-
-app.put('/user/:id', function(req, res) {
-
-    let id = req.params.id;
-
-    res.json({
-        id
-    });
-
-});
-
-app.delete('/user', function(req, res) {
-    res.json('deleteUser');
 });
 
 app.listen(process.env.PORT, () => {
