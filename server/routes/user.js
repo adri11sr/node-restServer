@@ -1,11 +1,18 @@
 const express = require('express');
-const User = require('../models/user');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const _ = require('underscore');
+
+const User = require('../models/user');
+const { verificaToken, verificaAdminRole } = require('../middlewares/authentication');
 
 const app = express();
 
-app.get('/user', function(req, res) {
+app.get('/user', verificaToken, (req, res) => {
+
+    // return res.json({
+    //     user: req.user,
+    //     nombre: req.user.name
+    // });
 
     let desde = req.query.desde || 0;
     desde = Number(desde);
@@ -39,7 +46,7 @@ app.get('/user', function(req, res) {
 
 });
 
-app.post('/user', function(req, res) {
+app.post('/user', [verificaToken, verificaAdminRole], (req, res) => {
 
     let body = req.body;
 
@@ -70,7 +77,7 @@ app.post('/user', function(req, res) {
 
 });
 
-app.put('/user/:id', function(req, res) {
+app.put('/user/:id', [verificaToken, verificaAdminRole], (req, res) => {
 
     let id = req.params.id;
     let body = _.pick(req.body, ['name', 'img', 'role', 'estado']);
@@ -93,7 +100,7 @@ app.put('/user/:id', function(req, res) {
 
 });
 
-app.put('/user/delete/:id', function(req, res) {
+app.put('/user/delete/:id', [verificaToken, verificaAdminRole], (req, res) => {
 
     let id = req.params.id;
 
@@ -119,7 +126,7 @@ app.put('/user/delete/:id', function(req, res) {
 
 });
 
-app.delete('/user/:id', function(req, res) {
+app.delete('/user/:id', [verificaToken, verificaAdminRole], (req, res) => {
 
     let id = req.params.id;
 
